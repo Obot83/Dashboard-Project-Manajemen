@@ -41,21 +41,47 @@ function getAuthHeaders(): HeadersInit {
   return headers;
 }
 
+function parseErrorMessage(errJson: unknown, statusText: string, status: number): string {
+  if (errJson && typeof errJson === 'object') {
+    const obj = errJson as Record<string, unknown>;
+    if (typeof obj.error === 'string') return obj.error;
+    if (obj.error && typeof obj.error === 'object') {
+      const errObj = obj.error as Record<string, unknown>;
+      if (typeof errObj.message === 'string') return errObj.message;
+      if (typeof errObj.code === 'string') return `Error (${errObj.code})`;
+      return JSON.stringify(obj.error);
+    }
+    if (typeof obj.message === 'string') return obj.message;
+  }
+  if (status === 500 || status === 502 || status === 503 || status === 504) {
+    return 'Gagal terhubung ke Backend API (502/504). Pastikan server backend sudah aktif dan URL backend telah diatur di Environment Variable Vercel (NEXT_PUBLIC_API_URL atau BACKEND_API_URL).';
+  }
+  return statusText || `API Error [${status}]`;
+}
+
 async function fetchJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    cache: 'no-store',
-    headers: getAuthHeaders(),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      cache: 'no-store',
+      headers: getAuthHeaders(),
+    });
+  } catch (netErr: any) {
+    throw new Error(
+      netErr?.message === 'Failed to fetch'
+        ? 'Tidak dapat terhubung ke Backend API. Periksa apakah server backend aktif dan URL backend sudah benar.'
+        : (netErr?.message || 'Network Error')
+    );
+  }
 
   if (!res.ok) {
-    let errorDetail = res.statusText;
+    let errJson: unknown = null;
     try {
-      const errJson = await res.json();
-      if (errJson && errJson.error) errorDetail = errJson.error;
+      errJson = await res.json();
     } catch {
       // ignore
     }
-    throw new Error(`API Error [${res.status}]: ${errorDetail}`);
+    throw new Error(parseErrorMessage(errJson, res.statusText, res.status));
   }
 
   return res.json();
@@ -73,21 +99,29 @@ async function sendJSON<T>(path: string, method: string, data?: unknown): Promis
     }
   }
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: data !== undefined ? JSON.stringify(data) : undefined,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: data !== undefined ? JSON.stringify(data) : undefined,
+    });
+  } catch (netErr: any) {
+    throw new Error(
+      netErr?.message === 'Failed to fetch'
+        ? 'Tidak dapat terhubung ke Backend API. Periksa apakah server backend aktif dan URL backend sudah benar.'
+        : (netErr?.message || 'Network Error')
+    );
+  }
 
   if (!res.ok) {
-    let errorDetail = res.statusText;
+    let errJson: unknown = null;
     try {
-      const errJson = await res.json();
-      if (errJson && errJson.error) errorDetail = errJson.error;
+      errJson = await res.json();
     } catch {
       // ignore
     }
-    throw new Error(errorDetail || `API Error [${res.status}]`);
+    throw new Error(parseErrorMessage(errJson, res.statusText, res.status));
   }
 
   return res.json();

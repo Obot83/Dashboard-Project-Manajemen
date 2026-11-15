@@ -45,8 +45,20 @@ export function LoginView({ onLoginSuccess }: LoginViewProps) {
       localStorage.setItem('token', res.token);
       localStorage.setItem('dashboard_user', JSON.stringify(res.user));
       onLoginSuccess(res.user, res.token);
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Login gagal. Periksa username dan password Anda.');
+    } catch (err: unknown) {
+      let msg = 'Login gagal. Periksa username dan password Anda.';
+      if (err instanceof Error) {
+        msg = err.message;
+      } else if (typeof err === 'string') {
+        msg = err;
+      } else if (err && typeof err === 'object') {
+        const obj = err as Record<string, unknown>;
+        msg = typeof obj.message === 'string' ? obj.message : JSON.stringify(err);
+      }
+      if (msg === '[object Object]') {
+        msg = 'Gagal terhubung ke Backend API. Pastikan server backend aktif dan URL backend telah diatur di Vercel.';
+      }
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
