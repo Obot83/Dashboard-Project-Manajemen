@@ -1,0 +1,34 @@
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+build/
+frontend/build/
+.pnp
+.pnp.*
+
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+backend/server.exe
+backend/test_build.exe
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs & temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+.DS_Store
+Thumbs.db

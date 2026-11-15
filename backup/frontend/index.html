@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TOP Project Dashboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <style>
+    :root {
+      --bg: #f0f2f7;
+      --surface: #ffffff;
+      --surface2: #f7f8fc;
+      --border: #e2e6ef;
+      --fg: #111827;
+      --fg2: #4b5563;
+      --fg3: #9ca3af;
+      --accent: #2563eb;
+      --accent-light: #eff4ff;
+      --accent2: #7c3aed;
+      --good: #059669;
+      --good-bg: #ecfdf5;
+      --warn: #d97706;
+      --warn-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --info: #0891b2;
+      --info-bg: #ecfeff;
+      --sidebar-w: 220px;
+      --header-h: 58px;
+      --font-head: 'Space Grotesk', system-ui, sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3347;
+        --fg: #f1f3f9; --fg2: #9ca3af; --fg3: #6b7280;
+        --accent: #3b82f6; --accent-light: #1e2a4a; --accent2: #a78bfa;
+        --good: #10b981; --good-bg: #052e16; --warn: #f59e0b; --warn-bg: #1c1507;
+        --danger: #ef4444; --danger-bg: #1f0a0a; --info: #22d3ee; --info-bg: #0a1f24;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3347;
+      --fg: #f1f3f9; --fg2: #9ca3af; --fg3: #6b7280;
+      --accent: #3b82f6; --accent-light: #1e2a4a; --accent2: #a78bfa;
+      --good: #10b981; --good-bg: #052e16; --warn: #f59e0b; --warn-bg: #1c1507;
+      --danger: #ef4444; --danger-bg: #1f0a0a; --info: #22d3ee; --info-bg: #0a1f24;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font-family: var(--font-body); font-size: 14px; line-height: 1.5;
+      display: flex;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed; top: 0; left: 0; height: 100vh;
+      display: flex; flex-direction: column; z-index: 100;
+      transition: transform .25s;
+    }
+    .sidebar-logo {
+      padding: 16px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-mark {
+      width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-family: var(--font-head); font-weight: 700; font-size: 14px; flex-shrink: 0;
+    }
+    .logo-text { font-family: var(--font-head); font-weight: 700; font-size: 15px; line-height: 1.2; }
+    .logo-sub { font-size: 11px; color: var(--fg3); font-weight: 400; }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+    .nav-label {
+      font-size: 10px; font-weight: 600; letter-spacing: .08em; color: var(--fg3);
+      text-transform: uppercase; padding: 8px 8px 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border-radius: 7px; cursor: pointer; color: var(--fg2); font-size: 13.5px;
+      font-weight: 500; transition: background .15s, color .15s; margin-bottom: 2px;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--fg); }
+    .nav-item.active { background: var(--accent-light); color: var(--accent); }
+    .nav-icon { font-size: 16px; flex-shrink: 0; }
+    .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--accent);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex-shrink: 0;
+    }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-role { font-size: 11px; color: var(--fg3); }
+
+    /* Main */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      position: sticky; top: env(safe-area-inset-top, 0px); height: var(--header-h);
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding-left: max(20px, env(safe-area-inset-left, 0px));
+      padding-right: max(20px, env(safe-area-inset-right, 0px));
+      gap: 12px; z-index: 50;
+    }
+    .topbar-title { font-family: var(--font-head); font-weight: 600; font-size: 16px; }
+    .topbar-badge { font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+    .topbar-spacer { flex: 1; }
+    
+    .project-filter-box {
+      display: flex; align-items: center; gap: 8px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px;
+    }
+    .project-filter-box label { font-size: 11px; font-weight: 600; color: var(--fg3); text-transform: uppercase; }
+    .project-filter-box select {
+      background: transparent; border: none; font-size: 13px; color: var(--fg);
+      outline: none; font-weight: 500; cursor: pointer; max-width: 220px;
+    }
+
+    .last-updated { font-size: 12px; color: var(--fg3); white-space: nowrap; }
+    .btn-icon { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; cursor: pointer; color: var(--fg2); font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-icon:hover { background: var(--border); color: var(--fg); }
+    .btn-primary { background: var(--accent); color: white; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: #1d4ed8; color: white; }
+
+    /* Page */
+    .page { display: none; padding: 24px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+    .page.active { display: block; }
+
+    /* Loader */
+    .loader { display: flex; align-items: center; justify-content: center; min-height: 160px; color: var(--fg3); gap: 10px; font-size: 13px; width: 100%; }
+    .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* KPI */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; transition: transform .15s, box-shadow .15s; }
+    .kpi-card.kpi-clickable { cursor: pointer; }
+    .kpi-card.kpi-clickable:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .kpi-label { font-size: 12px; font-weight: 500; color: var(--fg3); text-transform: uppercase; letter-spacing: .05em; display: flex; justify-content: space-between; align-items: center; }
+    .kpi-value { font-family: var(--font-head); font-size: 28px; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; line-height: 1; }
+    .kpi-sub { font-size: 12px; color: var(--fg3); }
+    .kpi-stripe { width: 32px; height: 3px; border-radius: 2px; margin-bottom: 2px; }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .grid-7-5 { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; margin-bottom: 20px; }
+
+    /* Card */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 18px; }
+    .card-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-family: var(--font-head); font-weight: 600; font-size: 14px; }
+    .card-sub { font-size: 12px; color: var(--fg3); }
+    .card-body { padding: 16px 18px; }
+
+    /* Bar chart */
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; }
+    .bar-label { font-size: 12px; color: var(--fg2); min-width: 120px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+    .bar-count { font-size: 12px; color: var(--fg3); min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Badge */
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .s-new { background: var(--accent-light); color: var(--accent); }
+    .s-progress { background: var(--info-bg); color: var(--info); }
+    .s-tested { background: var(--warn-bg); color: var(--warn); }
+    .s-developed { background: #f0fdf4; color: #16a34a; }
+    .s-closed { background: var(--surface2); color: var(--fg3); }
+    .s-onhold { background: #fff7ed; color: #ea580c; }
+    .s-rejected { background: var(--danger-bg); color: var(--danger); }
+    
+    .t-task { background: #eff6ff; color: #1d4ed8; }
+    .t-bug { background: #fef2f2; color: #b91c1c; }
+    .t-story { background: #faf5ff; color: #7c3aed; }
+    .t-epic { background: #fff7ed; color: #c2410c; }
+    .t-feature { background: #f0fdf4; color: #15803d; }
+    .t-milestone { background: #fdf4ff; color: #a21caf; }
+    .t-summary { background: var(--surface2); color: var(--fg3); }
+
+    .p-immediate { background: #fee2e2; color: #991b1b; font-weight: 700; }
+    .p-high { background: #ffedd5; color: #c2410c; }
+    .p-normal { background: var(--surface2); color: var(--fg2); }
+    .p-low { background: #f3f4f6; color: #6b7280; }
+
+    /* Health Badges */
+    .health-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .health-good { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .health-warning { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .health-critical { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--fg3); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); background: var(--surface2); white-space: nowrap; }
+    td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--fg2); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr.clickable-row { cursor: pointer; transition: background .12s; }
+    tr.clickable-row:hover td { background: var(--surface2); color: var(--fg); }
+    td.strong { color: var(--fg); font-weight: 500; }
+
+    /* Progress */
+    .prog-wrap { display: flex; align-items: center; gap: 8px; }
+    .prog-track { width: 75px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+    .prog-fill { height: 100%; border-radius: 3px; }
+    .prog-num { font-size: 12px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+
+    /* Donut */
+    .donut-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut-legend { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-name { flex: 1; color: var(--fg2); }
+    .legend-val { font-variant-numeric: tabular-nums; color: var(--fg); font-weight: 600; }
+
+    /* Workload */
+    .workload-list { display: flex; flex-direction: column; gap: 12px; }
+    .workload-item { display: flex; flex-direction: column; gap: 4px; }
+    .workload-header { display: flex; justify-content: space-between; align-items: center; }
+    .workload-name { font-size: 13px; font-weight: 500; }
+    .workload-count { font-size: 12px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+    .workload-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .workload-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+
+    /* Activity */
+    .activity-list { display: flex; flex-direction: column; }
+    .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-title { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .activity-meta { font-size: 11px; color: var(--fg3); margin-top: 2px; }
+
+    /* Controls Bar */
+    .controls-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .filter-tab { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--fg2); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; }
+    .filter-tab.active, .filter-tab:hover { background: var(--accent); border-color: var(--accent); color: white; }
+    .filter-tab.tab-danger.active { background: var(--danger); border-color: var(--danger); }
+
+    .search-bar { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; min-width: 240px; }
+    .search-bar input { flex: 1; border: none; background: none; color: var(--fg); font-size: 13px; outline: none; font-family: var(--font-body); }
+    .search-bar input::placeholder { color: var(--fg3); }
+
+    /* Pagination */
+    .pagination-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--surface); font-size: 13px; color: var(--fg2); }
+    .pagination-controls { display: flex; align-items: center; gap: 8px; }
+    .page-btn { padding: 5px 12px; border: 1px solid var(--border); background: var(--surface2); border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 500; }
+    .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .page-btn:not(:disabled):hover { background: var(--border); }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(2px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      width: 100%; max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: popModal .2s ease-out;
+    }
+    @keyframes popModal { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .modal-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--fg3); line-height: 1; padding: 4px; }
+    .modal-close:hover { color: var(--fg); }
+    .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; font-size: 13.5px; }
+
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .detail-item { display: flex; flex-direction: column; gap: 3px; background: var(--surface2); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); }
+    .detail-label { font-size: 11px; text-transform: uppercase; color: var(--fg3); font-weight: 600; letter-spacing: 0.05em; }
+    .detail-value { font-size: 13.5px; font-weight: 500; color: var(--fg); }
+
+    .desc-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; line-height: 1.6; white-space: pre-wrap; font-size: 13px; max-height: 200px; overflow-y: auto; }
+
+    /* Mobile */
+    .hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--fg); font-size: 20px; padding: 4px; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 90; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: flex; }
+      .grid-2, .grid-7-5 { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .page { padding: 14px; }
+      .project-filter-box select { max-width: 140px; }
+    }
+
+    #monthly-chart { display: flex; align-items: flex-end; gap: 4px; height: 100px; }
+    #monthly-chart > div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">TOP</div>
+    <div>
+      <div class="logo-text">Teknologi Operator</div>
+      <div class="logo-sub">Project Dashboard</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Overview</div>
+    <button class="nav-item active" onclick="showPage('overview',this)"><span class="nav-icon">📊</span> Overview</button>
+    <button class="nav-item" onclick="showPage('projects',this)"><span class="nav-icon">📁</span> Projects</button>
+    <div class="nav-label" style="margin-top:8px">Work Items</div>
+    <button class="nav-item" onclick="showPage('tasks',this)"><span class="nav-icon">✅</span> Work Packages</button>
+    <button class="nav-item" onclick="showPage('milestones',this)"><span class="nav-icon">🏁</span> Milestones</button>
+    <div class="nav-label" style="margin-top:8px">Analytics</div>
+    <button class="nav-item" onclick="showPage('workload',this)"><span class="nav-icon">👥</span> Workload &amp; Hours</button>
+    <button class="nav-item" onclick="showPage('reports',this)"><span class="nav-icon">📈</span> Reports</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">DP</div>
+      <div>
+        <div class="user-name">Deni Permana</div>
+        <div class="user-role">Project Manager</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title" id="page-title">Executive Overview</div>
+    <span class="topbar-badge" id="page-badge">Live</span>
+
+    <div class="topbar-spacer"></div>
+
+    <!-- Global Project Filter -->
+    <div class="project-filter-box">
+      <label for="project-select">Filter:</label>
+      <select id="project-select" onchange="onGlobalProjectChange(this.value)">
+        <option value="">Semua Project (Global)</option>
+      </select>
+    </div>
+
+    <span class="last-updated" id="last-updated">—</span>
+    <button class="btn-icon" onclick="refreshCurrentPage()" title="Refresh Data">↻ Refresh</button>
+    <button class="btn-icon" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="loader"><div class="spinner"></div> Memuat data…</div>
+    </div>
+    <div class="grid-7-5">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Volume Work Package</div><div class="card-sub">Dibuat per bulan — 12 bulan terakhir</div></div>
+        </div>
+        <div class="card-body">
+          <div id="monthly-chart"></div>
+          <div id="monthly-labels" style="display:flex;justify-content:space-between;font-size:11px;color:var(--fg3);margin-top:4px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Distribusi Status</div></div>
+        <div class="card-body">
+          <div class="donut-wrap">
+            <svg width="110" height="110" viewBox="0 0 110 110" id="donut-svg" style="flex-shrink:0"></svg>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Distribusi Per Tipe</div></div>
+        <div class="card-body"><div class="bar-chart" id="type-chart"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Distribusi Per Prioritas &amp; Aktivitas</div></div>
+        <div class="card-body">
+          <div class="bar-chart" id="priority-chart"></div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-family:var(--font-head);font-size:12px;font-weight:600;margin-bottom:10px">Aktivitas Terakhir</div>
+            <div class="activity-list" id="recent-activity"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="page" id="page-projects">
+    <div class="controls-bar">
+      <div class="search-bar">
+        <span style="color:var(--fg3)">🔍</span>
+        <input type="text" id="proj-search" placeholder="Cari nama project atau identifier…" oninput="filterProjects()">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-icon" onclick="exportProjectsToCSV()">📥 Export CSV</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Status Kesehatan</th>
+              <th>Nama Project</th>
+              <th>Identifier</th>
+              <th>Total Item</th>
+              <th>Closed</th>
+              <th>Close Rate</th>
+              <th>Est. Hours</th>
+              <th>Spent Hours</th>
+              <th>Dibuat</th>
+            </tr>
+          </thead>
+          <tbody id="projects-tbody"><tr><td colspan="9" class="loader"><div class="spinner"></div> Memuat…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORK PACKAGES -->
+  <div class="page" id="page-tasks">
+    <div class="controls-bar">
+      <div class="filter-tabs" id="status-filters">
+        <button class="filter-tab active" onclick="setTaskFilter('', this)">Semua</button>
+        <button class="filter-tab tab-danger" id="filter-btn-overdue" onclick="setTaskFilter('overdue', this)">🚨 Overdue</button>
+        <button class="filter-tab" onclick="setTaskFilter('In progress', this)">In Progress</button>
+        <button class="filter-tab" onclick="setTaskFilter('New', this)">New</button>
+        <button class="filter-tab" onclick="setTaskFilter('Developed', this)">Developed</button>
+        <button class="filter-tab" onclick="setTaskFilter('Tested', this)">Tested</button>
+        <button class="filter-tab" onclick="setTaskFilter('Closed', this)">Closed</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="search-bar">
+          <span style="color:var(--fg3)">🔍</span>
+          <input type="text" id="task-search" placeholder="Cari subject, project, assignee…" onkeyup="debounceTaskSearch()">
+        </div>
+        <button class="btn-icon" onclick="exportTasksToCSV()">📥 Export CSV</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Subject</th>
+              <th>Tipe</th>
+              <th>Prioritas</th>
+              <th>Status</th>
+              <th>Project</th>
+              <th>Assignee</th>
+              <th>Due Date</th>
+              <th>Done</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="tasks-tbody"><tr><td colspan="10" class="loader"><div class="spinner"></div> Memuat…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination-bar">
+        <span id="pagination-info">Menampilkan 0 dari 0 item</span>
+        <div class="pagination-controls">
+          <button class="page-btn" id="btn-prev-page" onclick="changeTaskPage(-1)">← Sebelumnya</button>
+          <span id="page-indicator" style="font-size:12px;font-weight:600">Hal. 1</span>
+          <button class="page-btn" id="btn-next-page" onclick="changeTaskPage(1)">Berikutnya →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MILESTONES -->
+  <div class="page" id="page-milestones">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Daftar Milestone</div></div>
+        <div class="card-body" id="milestones-list"><div class="loader"><div class="spinner"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Sprint &amp; Versi Rilis</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Versi</th><th>Project</th><th>Due</th><th>Status</th><th>Work Packages</th></tr></thead>
+            <tbody id="versions-tbody"><tr><td colspan="5" class="loader"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKLOAD & HOURS -->
+  <div class="page" id="page-workload">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Open Tasks per Anggota Tim</div><div class="card-sub">Pekerjaan aktif yang belum selesai</div></div>
+        </div>
+        <div class="card-body"><div class="workload-list" id="workload-list"><div class="loader"><div class="spinner"></div></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Jam Kerja Tercatat per Anggota Tim</div><div class="card-sub">Dari time entries</div></div>
+        </div>
+        <div class="card-body"><div class="bar-chart" id="user-time-chart"><div class="loader"><div class="spinner"></div></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Estimasi vs Realisasi Waktu (Budget &amp; Hours Tracking)</div><div class="card-sub">Perbandingan total jam estimasi dengan jam aktual yang di-log per project</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Estimasi (Jam)</th>
+              <th>Realisasi (Jam)</th>
+              <th>Rasio Jam (Spent / Est.)</th>
+              <th>Status Budget</th>
+            </tr>
+          </thead>
+          <tbody id="hours-tracking-tbody"><tr><td colspan="5" class="loader"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="page" id="page-reports">
+    <div class="kpi-grid" id="report-kpi">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Distribusi Seluruh Tipe Pekerjaan</div></div>
+        <div class="card-body"><div class="bar-chart" id="report-type-chart"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Top 10 Project berdasarkan Volume &amp; Selesai</div><div class="card-sub">Total vs Closed</div></div>
+        </div>
+        <div class="card-body"><div class="bar-chart" id="top-projects-chart"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task Detail Modal -->
+<div class="modal-overlay" id="task-modal" onclick="closeTaskModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <span class="badge s-new" id="modal-task-id">#0</span>
+        <div class="modal-title" id="modal-task-title">Detail Work Package</div>
+      </div>
+      <button class="modal-close" onclick="closeTaskModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-task-body">
+      <div class="loader"><div class="spinner"></div> Memuat detail…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:8000';
+  let cache = {};
+  let currentPage = 'overview';
+  let currentProjectId = '';
+  
+  // Work package page state
+  let currentTaskStatus = '';
+  let currentTaskOverdue = false;
+  let currentTaskPage = 1;
+  const taskPageLimit = 35;
+  let taskSearchTerm = '';
+  let searchTimeout = null;
+  let tasksData = [];
+  let projectsData = [];
+
+  async function fetchAPI(path) {
+    const key = path;
+    if (cache[key]) return cache[key];
+    const res = await fetch(API + path);
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const data = await res.json();
+    cache[key] = data;
+    return data;
+  }
+
+  function invalidateCache() { cache = {}; }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  function statusClass(s) {
+    const m = { 
+      'New':'s-new','In progress':'s-progress','Tested':'s-tested',
+      'Developed':'s-developed','Closed':'s-closed','On hold':'s-onhold',
+      'Rejected':'s-rejected','In testing':'s-progress',
+      'Ready To Production ':'s-developed','Confirmed':'s-new',
+      'Done':'s-developed'
+    };
+    return m[s] || 's-new';
+  }
+  function typeClass(t) {
+    const m = { 'Task':'t-task','Bug':'t-bug','User story':'t-story','Epic':'t-epic','Feature':'t-feature','Milestone':'t-milestone','Summary task':'t-summary' };
+    return m[t] || 't-task';
+  }
+  function priorityClass(p) {
+    const m = { 'Immediate':'p-immediate','High':'p-high','Normal':'p-normal','Low':'p-low' };
+    return m[p] || 'p-normal';
+  }
+  function statusBadge(s) { return `<span class="badge ${statusClass(s)}">${s||'—'}</span>`; }
+  function typeBadge(t) { return `<span class="badge ${typeClass(t)}">${t||'—'}</span>`; }
+  function priorityBadge(p) { return `<span class="badge ${priorityClass(p)}">${p||'Normal'}</span>`; }
+
+  function healthBadge(health, label) {
+    const cls = health === 'critical' ? 'health-critical' : health === 'warning' ? 'health-warning' : 'health-good';
+    const icon = health === 'critical' ? '🔴' : health === 'warning' ? '🟡' : '🟢';
+    return `<span class="health-badge ${cls}">${icon} ${label || health}</span>`;
+  }
+
+  function progBar(v, color) {
+    v = v || 0; color = color || 'var(--accent)';
+    return `<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:${Math.min(v,100)}%;background:${color}"></div></div><span class="prog-num">${v}%</span></div>`;
+  }
+  function fmtDate(d) { return d ? String(d).substring(0,10) : '—'; }
+  function relDate(d) {
+    if (!d) return '—';
+    const diff = Math.round((new Date() - new Date(d)) / 86400000);
+    if (diff === 0) return 'Hari ini';
+    if (diff === 1) return '1h lalu';
+    if (diff < 7) return diff + 'h lalu';
+    if (diff < 30) return Math.round(diff/7) + 'mg lalu';
+    return fmtDate(d);
+  }
+  function loader(msg) { return `<div class="loader"><div class="spinner"></div>${msg||'Memuat…'}</div>`; }
+  function errMsg(e) { return `<div style="color:var(--danger);padding:12px;font-size:13px">⚠ Gagal memuat: ${e.message}. Pastikan backend berjalan di <code>localhost:8000</code></div>`; }
+
+  const statusColors = { 'New':'var(--accent)','In progress':'var(--info)','Tested':'var(--warn)','Developed':'var(--good)','Closed':'var(--fg3)','On hold':'#ea580c','Rejected':'var(--danger)' };
+  const typeColors = { 'Task':'#2563eb','Bug':'#dc2626','User story':'#7c3aed','Epic':'#d97706','Feature':'#059669','Summary task':'#6b7280','Milestone':'#a21caf' };
+
+  function barChart(el, rows, maxVal) {
+    if (!rows || rows.length === 0) {
+      el.innerHTML = '<p style="color:var(--fg3);font-size:12px;padding:10px 0">Tidak ada data</p>';
+      return;
+    }
+    const max = maxVal || Math.max(...rows.map(r => r[1]), 1);
+    el.innerHTML = rows.map(([label, val, color]) =>
+      `<div class="bar-row">
+        <span class="bar-label" title="${label}">${label}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${((val/max)*100).toFixed(1)}%;background:${color||'var(--accent)'}"></div></div>
+        <span class="bar-count">${val}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ── Global Project Selector ──────────────────────────────────────────────
+
+  async function initProjectFilter() {
+    try {
+      const meta = await fetchAPI('/api/meta/filters');
+      const sel = document.getElementById('project-select');
+      const current = currentProjectId;
+      sel.innerHTML = '<option value="">Semua Project (Global)</option>' +
+        meta.projects.map(p => `<option value="${p.id}" ${p.id == current ? 'selected' : ''}>${p.name}</option>`).join('');
+    } catch(e) {
+      console.warn('Could not load project filters:', e);
+    }
+  }
+
+  function onGlobalProjectChange(val) {
+    currentProjectId = val;
+    invalidateCache();
+    currentTaskPage = 1;
+    refreshCurrentPage();
+  }
+
+  function selectProjectFromTable(pid) {
+    currentProjectId = pid;
+    document.getElementById('project-select').value = pid;
+    invalidateCache();
+    showPage('overview', document.querySelector('.nav-item'));
+  }
+
+  // ── Overview ──────────────────────────────────────────────────────────────
+
+  async function loadOverview() {
+    try {
+      const pParam = currentProjectId ? `?project_id=${currentProjectId}` : '';
+      const [kpi, status, types, priorities, monthly, wp] = await Promise.all([
+        fetchAPI(`/api/kpi${pParam}`),
+        fetchAPI(`/api/status-distribution${pParam}`),
+        fetchAPI(`/api/type-distribution${pParam}`),
+        fetchAPI(`/api/priority-distribution${pParam}`),
+        fetchAPI(`/api/monthly-volume${pParam}`),
+        fetchAPI(`/api/work-packages?limit=6${currentProjectId ? '&project_id=' + currentProjectId : ''}`),
+      ]);
+
+      // KPI Grid with clickable Overdue card
+      document.getElementById('kpi-grid').innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-stripe" style="background:var(--accent)"></div>
+          <div class="kpi-label"><span>Active Projects</span></div>
+          <div class="kpi-value">${kpi.projects}</div>
+          <div class="kpi-sub">${currentProjectId ? '1 project terpilih' : 'semua project aktif'}</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-stripe" style="background:var(--accent2)"></div>
+          <div class="kpi-label"><span>Work Packages</span></div>
+          <div class="kpi-value">${kpi.work_packages}</div>
+          <div class="kpi-sub">total item</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-stripe" style="background:var(--good)"></div>
+          <div class="kpi-label"><span>Closed</span></div>
+          <div class="kpi-value">${kpi.closed}</div>
+          <div class="kpi-sub">${kpi.close_rate}% close rate</div>
+        </div>
+        <div class="kpi-card kpi-clickable" onclick="navigateToOverdueTasks()" title="Klik untuk lihat task overdue">
+          <div class="kpi-stripe" style="background:var(--danger)"></div>
+          <div class="kpi-label"><span>Overdue 🚨</span><span style="font-size:10px;color:var(--danger);font-weight:700">KLIK DETAIL</span></div>
+          <div class="kpi-value" style="color:var(--danger)">${kpi.overdue}</div>
+          <div class="kpi-sub">melewati due date</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-stripe" style="background:var(--info)"></div>
+          <div class="kpi-label"><span>In Progress</span></div>
+          <div class="kpi-value">${kpi.in_progress}</div>
+          <div class="kpi-sub">sedang dikerjakan</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-stripe" style="background:var(--warn)"></div>
+          <div class="kpi-label"><span>Team Members</span></div>
+          <div class="kpi-value">${kpi.users}</div>
+          <div class="kpi-sub">pengguna aktif</div>
+        </div>
+      `;
+
+      // Monthly chart
+      if (monthly.length > 0) {
+        const maxM = Math.max(...monthly.map(r => r.count), 1);
+        document.getElementById('monthly-chart').innerHTML = monthly.map(r =>
+          `<div><span style="font-size:11px;color:var(--fg3)">${r.count}</span><div style="width:100%;background:var(--accent);border-radius:3px 3px 0 0;height:${Math.max(4,(r.count/maxM)*80)}px;opacity:.8"></div></div>`
+        ).join('');
+        document.getElementById('monthly-labels').innerHTML = monthly.map(r =>
+          `<span style="flex:1;text-align:center;font-size:10px">${r.month.replace(/^\d{4}-/,'').replace(/^0/,'')}/${r.month.substring(2,4)}</span>`
+        ).join('');
+      } else {
+        document.getElementById('monthly-chart').innerHTML = '<p style="color:var(--fg3);padding:20px;text-align:center;font-size:12px;width:100%">Tidak ada data bulanan</p>';
+        document.getElementById('monthly-labels').innerHTML = '';
+      }
+
+      // Donut Chart
+      const total = status.reduce((s,r) => s + r.count, 0);
+      const dColors = ['#2563eb','#0891b2','#059669','#d97706','#6b7280','#ea580c','#dc2626','#7c3aed'];
+      const cx=55,cy=55,r=40,iR=25; let ang = -Math.PI/2; let paths='';
+      
+      if (total > 0) {
+        status.slice(0,8).forEach((row,i) => {
+          const a = (row.count/total)*2*Math.PI;
+          const col = dColors[i % dColors.length];
+          const x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang),x2=cx+r*Math.cos(ang+a),y2=cy+r*Math.sin(ang+a);
+          const ix1=cx+iR*Math.cos(ang),iy1=cy+iR*Math.sin(ang),ix2=cx+iR*Math.cos(ang+a),iy2=cy+iR*Math.sin(ang+a);
+          const lf=a>Math.PI?1:0;
+          paths+=`<path d="M${ix1},${iy1} L${x1},${y1} A${r},${r},0,${lf},1,${x2},${y2} L${ix2},${iy2} A${iR},${iR},0,${lf},0,${ix1},${iy1}" fill="${col}" opacity=".9"/>`;
+          ang+=a;
+        });
+        paths+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">${total}</text>`;
+        paths+=`<text x="${cx}" y="${cy+10}" text-anchor="middle" font-size="9" fill="currentColor" opacity=".5">total</text>`;
+        document.getElementById('donut-svg').innerHTML = paths;
+        document.getElementById('donut-legend').innerHTML = status.slice(0,6).map((r,i) =>
+          `<div class="legend-item"><div class="legend-dot" style="background:${dColors[i%dColors.length]}"></div><span class="legend-name">${r.status}</span><span class="legend-val">${r.count}</span></div>`
+        ).join('');
+      } else {
+        document.getElementById('donut-svg').innerHTML = '';
+        document.getElementById('donut-legend').innerHTML = '<p style="color:var(--fg3);font-size:12px">Tidak ada data status</p>';
+      }
+
+      // Type & priority charts
+      barChart(document.getElementById('type-chart'), types.map(r => [r.type, r.count, typeColors[r.type]||'var(--accent)']));
+      barChart(document.getElementById('priority-chart'), priorities.map(r => [r.priority, r.count, r.priority==='Immediate'?'var(--danger)':r.priority==='High'?'var(--warn)':'var(--fg3)']));
+
+      // Recent Activity
+      document.getElementById('recent-activity').innerHTML = wp.items && wp.items.length
+        ? wp.items.map(r =>
+          `<div class="activity-item clickable-row" onclick="openTaskDetail(${r.id})" style="cursor:pointer">
+            <div class="activity-dot" style="background:${statusColors[r.status]||'var(--fg3)'}"></div>
+            <div class="activity-body">
+              <div class="activity-title">#${r.id} ${r.subject}</div>
+              <div class="activity-meta">${r.type} · ${r.project} · ${relDate(r.updated_at)}</div>
+            </div>
+          </div>`
+        ).join('')
+        : '<p style="color:var(--fg3);font-size:12px">Tidak ada aktivitas</p>';
+
+    } catch(e) {
+      document.getElementById('kpi-grid').innerHTML = errMsg(e);
+    }
+  }
+
+  function navigateToOverdueTasks() {
+    const taskBtn = document.querySelector('button[onclick*="tasks"]');
+    showPage('tasks', taskBtn);
+    setTaskFilter('overdue', document.getElementById('filter-btn-overdue'));
+  }
+
+  // ── Projects ──────────────────────────────────────────────────────────────
+
+  async function loadProjects() {
+    try {
+      projectsData = await fetchAPI('/api/projects');
+      renderProjectsTable(projectsData);
+    } catch(e) {
+      document.getElementById('projects-tbody').innerHTML = `<tr><td colspan="9">${errMsg(e)}</td></tr>`;
+    }
+  }
+
+  function renderProjectsTable(data) {
+    if (!data || data.length === 0) {
+      document.getElementById('projects-tbody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--fg3);padding:24px">Tidak ada project</td></tr>';
+      return;
+    }
+    document.getElementById('projects-tbody').innerHTML = data.map(r => `
+      <tr class="clickable-row" onclick="selectProjectFromTable(${r.id})" title="Klik untuk memfilter dashboard ke project ini">
+        <td>${healthBadge(r.health, r.health_label)}</td>
+        <td class="strong">${r.name}</td>
+        <td><code style="font-size:11px;color:var(--fg3)">${r.identifier}</code></td>
+        <td style="text-align:center;font-variant-numeric:tabular-nums">${r.wp_count}</td>
+        <td style="text-align:center;font-variant-numeric:tabular-nums">${r.closed_count}</td>
+        <td>${progBar(r.close_rate, 'var(--good)')}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums">${r.estimated_hours || 0}h</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums">${r.spent_hours || 0}h</td>
+        <td style="font-size:12px;color:var(--fg3)">${fmtDate(r.created_at)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function filterProjects() {
+    const q = document.getElementById('proj-search').value.toLowerCase();
+    renderProjectsTable(projectsData.filter(r => r.name.toLowerCase().includes(q) || r.identifier.toLowerCase().includes(q)));
+  }
+
+  function exportProjectsToCSV() {
+    if (!projectsData || projectsData.length === 0) {
+      alert('Tidak ada data project.');
+      return;
+    }
+    const headers = ['Health', 'Project Name', 'Identifier', 'Total Items', 'Closed Items', 'Close Rate (%)', 'Estimated Hours', 'Spent Hours', 'Created At'];
+    const rows = projectsData.map(r => [
+      r.health_label || r.health,
+      `"${(r.name || '').replace(/"/g, '""')}"`,
+      r.identifier,
+      r.wp_count || 0,
+      r.closed_count || 0,
+      r.close_rate || 0,
+      r.estimated_hours || 0,
+      r.spent_hours || 0,
+      r.created_at || ''
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    downloadFile(csvContent, `projects_${new Date().toISOString().slice(0,10)}.csv`);
+  }
+
+  // ── Work Packages (With Real SQL Pagination & Filters) ─────────────────────
+
+  async function loadTasks() {
+    try {
+      const offset = (currentTaskPage - 1) * taskPageLimit;
+      let url = `/api/work-packages?limit=${taskPageLimit}&offset=${offset}`;
+
+      if (currentProjectId) url += `&project_id=${currentProjectId}`;
+      if (currentTaskOverdue) url += `&is_overdue=true`;
+      else if (currentTaskStatus) url += `&status=${encodeURIComponent(currentTaskStatus)}`;
+      if (taskSearchTerm) url += `&search=${encodeURIComponent(taskSearchTerm)}`;
+
+      const data = await fetchAPI(url);
+      tasksData = data.items;
+
+      renderTasksTable(tasksData);
+
+      // Update pagination
+      const total = data.total;
+      const start = total ? offset + 1 : 0;
+      const end = Math.min(offset + taskPageLimit, total);
+      document.getElementById('pagination-info').textContent = `Menampilkan ${start} - ${end} dari total ${total} item`;
+      document.getElementById('page-indicator').textContent = `Hal. ${data.page} dari ${data.pages || 1}`;
+
+      document.getElementById('btn-prev-page').disabled = data.page <= 1;
+      document.getElementById('btn-next-page').disabled = data.page >= data.pages;
+
+    } catch(e) {
+      document.getElementById('tasks-tbody').innerHTML = `<tr><td colspan="10">${errMsg(e)}</td></tr>`;
+    }
+  }
+
+  function renderTasksTable(data) {
+    if (!data || data.length === 0) {
+      document.getElementById('tasks-tbody').innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--fg3);padding:24px">Tidak ada work package yang cocok</td></tr>';
+      return;
+    }
+    document.getElementById('tasks-tbody').innerHTML = data.map(r => {
+      const overdueAlert = r.days_overdue > 0 ? `<div style="font-size:10px;color:var(--danger);font-weight:600">🚨 Terlambat ${r.days_overdue} hari</div>` : '';
+      return `
+        <tr class="clickable-row" onclick="openTaskDetail(${r.id})" title="Klik untuk lihat detail">
+          <td style="color:var(--fg3);font-variant-numeric:tabular-nums">#${r.id}</td>
+          <td class="strong" style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.subject}">
+            ${r.subject}
+            ${overdueAlert}
+          </td>
+          <td>${typeBadge(r.type)}</td>
+          <td>${priorityBadge(r.priority)}</td>
+          <td>${statusBadge(r.status)}</td>
+          <td style="font-size:12px;color:var(--fg3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.project}</td>
+          <td style="font-size:12px;color:var(--fg3)">${r.assignee||'—'}</td>
+          <td style="font-size:12px;white-space:nowrap">${fmtDate(r.due_date)}</td>
+          <td>${r.done_ratio!=null?progBar(r.done_ratio):'—'}</td>
+          <td style="font-size:12px;color:var(--fg3)">${relDate(r.updated_at)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function setTaskFilter(type, btn) {
+    document.querySelectorAll('#status-filters .filter-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    if (type === 'overdue') {
+      currentTaskOverdue = true;
+      currentTaskStatus = '';
+    } else {
+      currentTaskOverdue = false;
+      currentTaskStatus = type;
+    }
+    currentTaskPage = 1;
+    invalidateCache();
+    loadTasks();
+  }
+
+  function changeTaskPage(delta) {
+    currentTaskPage += delta;
+    if (currentTaskPage < 1) currentTaskPage = 1;
+    loadTasks();
+  }
+
+  function debounceTaskSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      taskSearchTerm = document.getElementById('task-search').value.trim();
+      currentTaskPage = 1;
+      invalidateCache();
+      loadTasks();
+    }, 350);
+  }
+
+  function exportTasksToCSV() {
+    if (!tasksData || tasksData.length === 0) {
+      alert('Tidak ada data tasks.');
+      return;
+    }
+    const headers = ['ID', 'Subject', 'Type', 'Priority', 'Status', 'Project', 'Assignee', 'Due Date', 'Done Ratio (%)', 'Updated At'];
+    const rows = tasksData.map(r => [
+      r.id,
+      `"${(r.subject || '').replace(/"/g, '""')}"`,
+      r.type,
+      r.priority,
+      r.status,
+      `"${(r.project || '').replace(/"/g, '""')}"`,
+      `"${(r.assignee || '—').replace(/"/g, '""')}"`,
+      r.due_date || '',
+      r.done_ratio || 0,
+      r.updated_at || ''
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    downloadFile(csvContent, `work_packages_${new Date().toISOString().slice(0,10)}.csv`);
+  }
+
+  // ── Work Package Detail Modal ─────────────────────────────────────────────
+
+  async function openTaskDetail(wpId) {
+    const modal = document.getElementById('task-modal');
+    modal.classList.add('open');
+    document.getElementById('modal-task-id').textContent = `#${wpId}`;
+    document.getElementById('modal-task-title').textContent = 'Memuat detail…';
+    document.getElementById('modal-task-body').innerHTML = loader('Memuat data work package…');
+
+    try {
+      const data = await fetchAPI(`/api/work-packages/${wpId}`);
+      document.getElementById('modal-task-title').textContent = data.subject;
+
+      let customFieldsHtml = '';
+      if (data.custom_fields && data.custom_fields.length > 0) {
+        customFieldsHtml = `
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--fg3);text-transform:uppercase">Custom Fields</div>
+            <div class="detail-grid">
+              ${data.custom_fields.map(cf => `
+                <div class="detail-item">
+                  <span class="detail-label">${cf.name}</span>
+                  <span class="detail-value">${cf.value}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      let journalsHtml = '';
+      if (data.journals && data.journals.length > 0) {
+        journalsHtml = `
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--fg3);text-transform:uppercase">Riwayat Pembaruan Terakhir</div>
+            <div class="activity-list">
+              ${data.journals.map(j => `
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:var(--accent)"></div>
+                  <div class="activity-body">
+                    <div style="font-size:13px">${j.notes || 'Pembaruan work package'} (v${j.version})</div>
+                    <div class="activity-meta">${j.author || 'Sistem'} · ${relDate(j.created_at)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('modal-task-body').innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">Status</span><span class="detail-value">${statusBadge(data.status)}</span></div>
+          <div class="detail-item"><span class="detail-label">Tipe</span><span class="detail-value">${typeBadge(data.type)}</span></div>
+          <div class="detail-item"><span class="detail-label">Prioritas</span><span class="detail-value">${priorityBadge(data.priority)}</span></div>
+          <div class="detail-item"><span class="detail-label">Project</span><span class="detail-value strong">${data.project}</span></div>
+          <div class="detail-item"><span class="detail-label">Assignee</span><span class="detail-value">${data.assignee || '—'}</span></div>
+          <div class="detail-item"><span class="detail-label">Author</span><span class="detail-value">${data.author || '—'}</span></div>
+          <div class="detail-item">
+            <span class="detail-label">Due Date</span>
+            <span class="detail-value" style="${data.days_overdue > 0 ? 'color:var(--danger);font-weight:700' : ''}">
+              ${fmtDate(data.due_date)} ${data.days_overdue > 0 ? `(Terlambat ${data.days_overdue} hari)` : ''}
+            </span>
+          </div>
+          <div class="detail-item"><span class="detail-label">Progress</span><span class="detail-value">${progBar(data.done_ratio)}</span></div>
+          <div class="detail-item"><span class="detail-label">Estimasi Waktu</span><span class="detail-value">${data.estimated_hours || 0} Jam</span></div>
+          <div class="detail-item"><span class="detail-label">Jam Tercatat</span><span class="detail-value">${data.spent_hours || 0} Jam</span></div>
+        </div>
+
+        <div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--fg3);text-transform:uppercase">Deskripsi</div>
+          <div class="desc-box">${data.description ? data.description : '<span style="color:var(--fg3);font-style:italic">Tidak ada deskripsi</span>'}</div>
+        </div>
+
+        ${customFieldsHtml}
+        ${journalsHtml}
+      `;
+    } catch(e) {
+      document.getElementById('modal-task-body').innerHTML = errMsg(e);
+    }
+  }
+
+  function closeTaskModal(event) {
+    if (!event || event.target.id === 'task-modal' || event.target.classList.contains('modal-close')) {
+      document.getElementById('task-modal').classList.remove('open');
+    }
+  }
+
+  // ── Milestones ────────────────────────────────────────────────────────────
+
+  async function loadMilestones() {
+    try {
+      const pParam = currentProjectId ? `?project_id=${currentProjectId}` : '';
+      const [milestones, versions] = await Promise.all([
+        fetchAPI(`/api/milestones${pParam}`),
+        fetchAPI(`/api/versions${pParam}`)
+      ]);
+
+      document.getElementById('milestones-list').innerHTML = milestones.length
+        ? `<div class="activity-list">${milestones.map(r =>
+            `<div class="activity-item">
+              <div class="activity-dot" style="background:${r.is_closed ? 'var(--good)' : 'var(--accent)'}"></div>
+              <div class="activity-body">
+                <div class="activity-title">${r.subject}</div>
+                <div class="activity-meta">${r.project} · ${fmtDate(r.due_date)} · ${statusBadge(r.status)}</div>
+                ${r.done_ratio!=null?`<div style="margin-top:4px">${progBar(r.done_ratio)}</div>`:''}
+              </div>
+            </div>`
+          ).join('')}</div>`
+        : '<p style="color:var(--fg3);font-size:13px;padding:14px 0">Tidak ada milestone untuk project ini</p>';
+
+      document.getElementById('versions-tbody').innerHTML = versions.length
+        ? versions.map(r =>
+          `<tr>
+            <td class="strong">${r.name}</td>
+            <td style="font-size:12px;color:var(--fg3)">${r.project}</td>
+            <td style="font-size:12px">${fmtDate(r.effective_date)}</td>
+            <td>${statusBadge(r.status==='open'?'In progress':'Closed')}</td>
+            <td style="text-align:center;font-variant-numeric:tabular-nums">${r.wp_count}</td>
+          </tr>`
+        ).join('')
+        : '<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:20px">Tidak ada versi / sprint</td></tr>';
+    } catch(e) {
+      document.getElementById('milestones-list').innerHTML = errMsg(e);
+    }
+  }
+
+  // ── Workload & Hours ──────────────────────────────────────────────────────
+
+  async function loadWorkload() {
+    try {
+      const pParam = currentProjectId ? `?project_id=${currentProjectId}` : '';
+      const [workload, tracking] = await Promise.all([
+        fetchAPI(`/api/workload${pParam}`),
+        fetchAPI(`/api/time-tracking${pParam}`),
+      ]);
+
+      // Open tasks per user
+      const maxW = workload[0]?.open_tasks || 1;
+      document.getElementById('workload-list').innerHTML = workload.length
+        ? workload.map(r =>
+          `<div class="workload-item">
+            <div class="workload-header"><span class="workload-name">${r.name}</span><span class="workload-count">${r.open_tasks} open / ${r.total_tasks} total</span></div>
+            <div class="workload-track"><div class="workload-fill" style="width:${((r.open_tasks/maxW)*100).toFixed(1)}%"></div></div>
+          </div>`
+        ).join('')
+        : '<p style="color:var(--fg3);font-size:12px;padding:10px 0">Tidak ada data workload</p>';
+
+      // User logged hours
+      barChart(document.getElementById('user-time-chart'), tracking.by_user.map(u => [u.user_name, u.total_hours, 'var(--accent2)']));
+
+      // Budget & hours comparison table
+      document.getElementById('hours-tracking-tbody').innerHTML = tracking.by_project.length
+        ? tracking.by_project.map(p => {
+          const ratio = p.estimated_hours > 0 ? (p.spent_hours / p.estimated_hours * 100) : null;
+          let statusLabel = '<span class="badge s-progress">On Track</span>';
+          if (p.estimated_hours > 0 && p.spent_hours > p.estimated_hours) {
+            statusLabel = '<span class="badge s-rejected">Over Budget</span>';
+          } else if (ratio !== null && ratio >= 85) {
+            statusLabel = '<span class="badge s-onhold">Near Budget</span>';
+          }
+          return `
+            <tr>
+              <td class="strong">${p.name}</td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums">${p.estimated_hours}h</td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums">${p.spent_hours}h</td>
+              <td>${ratio !== null ? progBar(Math.round(ratio), ratio > 100 ? 'var(--danger)' : 'var(--accent)') : '<span style="color:var(--fg3)">—</span>'}</td>
+              <td>${statusLabel}</td>
+            </tr>
+          `;
+        }).join('')
+        : '<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:18px">Belum ada catatan estimasi atau jam kerja tercatat</td></tr>';
+
+    } catch(e) {
+      document.getElementById('workload-list').innerHTML = errMsg(e);
+    }
+  }
+
+  // ── Reports (100% Dynamic, No Hardcoded Values) ───────────────────────────
+
+  async function loadReports() {
+    try {
+      const pParam = currentProjectId ? `?project_id=${currentProjectId}` : '';
+      const [reports, types] = await Promise.all([
+        fetchAPI(`/api/reports-summary${pParam}`),
+        fetchAPI(`/api/type-distribution${pParam}`),
+      ]);
+
+      const st = reports.stats;
+      const total = st.total_items || 1;
+
+      document.getElementById('report-kpi').innerHTML = `
+        <div class="kpi-card">
+          <div class="kpi-label">Total Bug</div>
+          <div class="kpi-value" style="color:var(--danger)">${st.bug_count}</div>
+          <div class="kpi-sub">${((st.bug_count/total)*100).toFixed(1)}% dari semua item</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">User Stories</div>
+          <div class="kpi-value" style="color:var(--accent2)">${st.story_count}</div>
+          <div class="kpi-sub">${((st.story_count/total)*100).toFixed(1)}% dari semua item</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">On Hold</div>
+          <div class="kpi-value" style="color:var(--warn)">${st.on_hold_count}</div>
+          <div class="kpi-sub">item ditangguhkan</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Rejected</div>
+          <div class="kpi-value" style="color:var(--danger)">${st.rejected_count}</div>
+          <div class="kpi-sub">item ditolak</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Est. Hours</div>
+          <div class="kpi-value" style="color:var(--info)">${st.total_estimated_hours}h</div>
+          <div class="kpi-sub">estimasi kerja tim</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Spent Hours</div>
+          <div class="kpi-value" style="color:var(--good)">${reports.total_spent_hours}h</div>
+          <div class="kpi-sub">jam aktual di-log</div>
+        </div>
+      `;
+
+      barChart(document.getElementById('report-type-chart'), types.map(r => [r.type, r.count, typeColors[r.type]||'var(--accent)']));
+
+      // Top projects dynamic chart
+      const maxP = Math.max(...reports.top_projects.map(r => r.total), 1);
+      document.getElementById('top-projects-chart').innerHTML = reports.top_projects.map(r => {
+        const rate = r.total > 0 ? Math.round(r.closed / r.total * 100) : 0;
+        return `
+          <div class="bar-row">
+            <span class="bar-label" title="${r.name}">${r.name}</span>
+            <div class="bar-track" style="position:relative">
+              <div class="bar-fill" style="width:${((r.total/maxP)*100).toFixed(1)}%;background:var(--border)"></div>
+              <div style="position:absolute;top:0;left:0;height:100%;width:${((r.closed/maxP)*100).toFixed(1)}%;background:var(--good);border-radius:4px;"></div>
+            </div>
+            <span class="bar-count">${rate}% (${r.closed}/${r.total})</span>
+          </div>
+        `;
+      }).join('');
+
+    } catch(e) {
+      document.getElementById('report-kpi').innerHTML = errMsg(e);
+    }
+  }
+
+  // ── Page Navigation & Handlers ───────────────────────────────────────────
+
+  const pageTitles = {
+    overview:   ['Executive Overview', 'Live'],
+    projects:   ['Projects Management', 'Aktif'],
+    tasks:      ['Work Packages', 'Items'],
+    milestones: ['Milestones & Roadmap', 'Sprint'],
+    workload:   ['Workload & Budget', 'Tim'],
+    reports:    ['Analitik & Laporan', 'Lengkap'],
+  };
+
+  const loaders = {
+    overview: loadOverview,
+    projects: loadProjects,
+    tasks: loadTasks,
+    milestones: loadMilestones,
+    workload: loadWorkload,
+    reports: loadReports,
+  };
+
+  function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    const [title, badge] = pageTitles[id] || [id, ''];
+    document.getElementById('page-title').textContent = title;
+    document.getElementById('page-badge').textContent = badge;
+    currentPage = id;
+    closeSidebar();
+    if (loaders[id]) loaders[id]();
+  }
+
+  function refreshCurrentPage() {
+    invalidateCache();
+    initProjectFilter();
+    if (loaders[currentPage]) loaders[currentPage]();
+    document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString('id-ID');
+  }
+
+  function downloadFile(content, fileName) {
+    const encodedUri = encodeURI(content);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function toggleTheme() {
+    const root = document.documentElement;
+    const cur = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    document.querySelector('.btn-icon:last-child').textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+
+  document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString('id-ID');
+  initProjectFilter();
+  loadOverview();
+</script>
+</body>
+</html>
